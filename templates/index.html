@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask Todo App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Flask Todo App</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="todo-form">
+            <h2>Add New Todo</h2>
+            <form action="{{ url_for('add') }}" method="post">
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" name="title" id="title" placeholder="Enter todo title" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description (Optional)</label>
+                    <textarea name="description" id="description" rows="3" placeholder="Enter todo description"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Add Todo</button>
+            </form>
+        </div>
+
+        <h2>Your Todos</h2>
+        {% if todos %}
+            <ul class="todos">
+                {% for todo in todos %}
+                    <li class="todo-item {% if todo.completed %}todo-completed{% endif %}">
+                        <div class="todo-content">
+                            <div class="todo-title">{{ todo.title }}</div>
+                            {% if todo.description %}
+                                <div class="todo-description">{{ todo.description }}</div>
+                            {% endif %}
+                            <div class="todo-timestamp">Created: {{ todo.created_at.strftime('%Y-%m-%d %H:%M') }}</div>
+                        </div>
+                        <div class="todo-actions">
+                            <a href="{{ url_for('complete', id=todo.id) }}" class="btn btn-success">
+                                {% if todo.completed %}Undo{% else %}Complete{% endif %}
+                            </a>
+                            <a href="{{ url_for('edit', id=todo.id) }}" class="btn btn-primary">Edit</a>
+                            <a href="{{ url_for('delete', id=todo.id) }}" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this todo?')">Delete</a>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No todos yet. Add your first todo above!</p>
+        {% endif %}
+    </div>
+</body>
+</html> 
